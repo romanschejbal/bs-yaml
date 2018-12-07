@@ -1,6 +1,6 @@
 {
   "name": "bs-yaml",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "ReasonML bindings for the npm Yaml package",
   "main": "index.js",
   "repository": "https://github.com/romanschejbal/bs-yaml",
@@ -14,7 +14,7 @@
     "test": "jest"
   },
   "dependencies": {
-    "yaml": "^1.0.3"
+    "js-yaml": "^3.12.0"
   },
   "jest": {
     "testMatch": [

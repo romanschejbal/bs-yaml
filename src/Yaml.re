@@ -6,12 +6,15 @@ type value =
   | Array(list(value))
   | Object(list((string, value)));
 
-[@bs.module "yaml"] external yamlParse: string => Js.Json.t = "parse";
-[@bs.module "yaml"] external yamlStringify: Js.Json.t => string = "stringify";
+[@bs.module "js-yaml"]
+external yamlParse: (string, ~options: 'a=?, unit) => Js.Json.t = "safeLoad";
+[@bs.module "js-yaml"]
+external yamlStringify: (Js.Json.t, ~options: 'a=?, unit) => string =
+  "safeDump";
 
-let parse = str => {
+let parseWithOpts = (str, options) => {
   let json =
-    switch (yamlParse(str)) {
+    switch (yamlParse(str, ~options, ())) {
     | exception _ => Js.Json.null
     | x => x
     };
@@ -24,18 +27,21 @@ let parse = str => {
     | Js.Json.JSONNumber(n) => Float(n)
     | Js.Json.JSONString(s) => String(s)
     | Js.Json.JSONArray(arr) => Array(Array.map(p, arr) |> Array.to_list)
-    | Js.Json.JSONObject(o) =>
+    | Js.Json.JSONObject(o) when Js.typeof(o) != "undefined" =>
       Object(
         Js.Dict.entries(o)
         |> Array.map(((key, value)) => (key, p(value)))
         |> Array.to_list,
       )
+    | Js.Json.JSONObject(_) => Null
     };
 
   p(json);
 };
 
-let stringify = yaml => {
+let parse = str => parseWithOpts(str, None);
+
+let stringifyWithOpts = (yaml, options) => {
   let rec s = yaml =>
     switch (yaml) {
     | Bool(value) => Js.Json.boolean(value)
@@ -52,7 +58,9 @@ let stringify = yaml => {
     json =>
       switch (Js.Json.classify(json)) {
       | Js.Json.JSONNull => ""
-      | _ => yamlStringify(json)
+      | _ => yamlStringify(json, ~options, ())
       }
   );
 };
+
+let stringify = yaml => stringifyWithOpts(yaml, None);

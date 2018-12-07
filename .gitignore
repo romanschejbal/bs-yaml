@@ -27,3 +27,4 @@ lib/bs
 node_modules
 lib
 **/*.bs.js
+yarn-error.log

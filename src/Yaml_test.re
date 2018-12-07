@@ -15,21 +15,25 @@ test("Float", () =>
 );
 
 test("String", () =>
-  parse("tenis") |> expect |> toEqual(String("tenis"))
+  parse("iamstring") |> expect |> toEqual(String("iamstring"))
 );
 
 test("Array", () =>
-  parse("- tenis") |> expect |> toEqual(Array([String("tenis")]))
-);
-
-test("Array", () =>
-  parse("- tenis\n- aloha")
+  parse("- single item in an array")
   |> expect
-  |> toEqual(Array([String("tenis"), String("aloha")]))
+  |> toEqual(Array([String("single item in an array")]))
+);
+
+test("Array", () =>
+  parse("- hello\n- aloha")
+  |> expect
+  |> toEqual(Array([String("hello"), String("aloha")]))
 );
 
 test("Object", () =>
-  parse("tenis: 1") |> expect |> toEqual(Object([("tenis", Float(1.))]))
+  parse("replicas: 1")
+  |> expect
+  |> toEqual(Object([("replicas", Float(1.))]))
 );
 
 test("More complex object", () =>
@@ -49,7 +53,7 @@ test("Stringify Float", () =>
 );
 
 test("Stringify String", () =>
-  stringify(String("Ahoj")) |> expect |> toEqual("Ahoj\n")
+  stringify(String("ola")) |> expect |> toEqual("ola\n")
 );
 
 test("Stringify Array", () =>
@@ -58,28 +62,30 @@ test("Stringify Array", () =>
   |> toEqual("- 1\n- 2\n")
 );
 
-test("Stringify Object", () =>
-  stringify(
+test("Stringify Object with options", () =>
+  stringifyWithOpts(
     Object([
-      ("first", Float(1.)),
       ("second", Array([Float(1.), String("str")])),
+      ("first", Float(1.)),
       ("third", Object([("here", Float(2.))])),
     ]),
+    {"sortKeys": true},
   )
   |> expect
   |> toEqual("first: 1\nsecond:\n  - 1\n  - str\nthird:\n  here: 2\n")
 );
 
 test("Comments", () =>
-  parse("<<: more\n# whaat\nsrani: 1\n")
+  parse("test: more\n# what\nup: 1\n")
   |> stringify
   |> expect
-  |> toEqual("<<: more\nsrani: 1\n")
+  |> toEqual("test: more\nup: 1\n")
 );
 
 test("Empty yaml", () =>
   parse("") |> stringify |> expect |> toEqual("")
 );
+
 test("Only one comment yaml", () =>
   parse("# comment") |> stringify |> expect |> toEqual("")
 );
