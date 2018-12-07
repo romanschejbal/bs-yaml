@@ -4,8 +4,8 @@ jobs:
     docker:
       - image: node:8
     steps:
-      - run: apt-get update && apt-get install -y opam
       - checkout
+      - run: apt-get update && apt-get install -y opam
       - restore_cache:
           key: yarn-{{ checksum "yarn.lock" }}
       - run: yarn --frozen-lockfile
